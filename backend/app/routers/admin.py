@@ -107,6 +107,25 @@ def update_show(
     return show
 
 
+@router.delete("/shows/{show_id}", status_code=204)
+def delete_show(
+    show_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    show = db.get(Show, show_id)
+
+    if not show:
+        raise HTTPException(
+            status_code=404,
+            detail="Show not found",
+        )
+
+    db.delete(show)
+    db.commit()
+
+
+
 @router.post("/shows/{show_id}/publish-flag", response_model=ShowOut)
 def set_show_publish_flag(
     show_id: str,
