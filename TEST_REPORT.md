@@ -33,8 +33,7 @@
 Automated tests cover the highest-risk backend functionality, including:
 
 - Authentication behavior
-- Role-based access control
-- Artwork validation
+- Role-based access control- Artwork validation
 - Publish behavior
 - Catalog generation
 
@@ -76,4 +75,23 @@ The following functionality was manually verified:
 **Overall Result: PASS**
 
 The implemented Peblo TV Mini functionality was tested successfully in the local development environment.
+
+## Automated Testing
+
+Automated tests cover the highest-risk backend functionality, including:
+
+- Authentication behavior
+- Role-based access control
+- Artwork validation
+- Publish behavior
+- Catalog generation
+
+Run automated tests using:
+
+```bash
+docker compose exec api pytest tests/ -v
+
+Then save and run:
+
+```bash
 
