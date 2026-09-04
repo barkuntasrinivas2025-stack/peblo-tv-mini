@@ -227,6 +227,24 @@ def create_episode(
     return episode
 
 
+@router.delete("/episodes/{episode_id}", status_code=204)
+def delete_episode(
+    episode_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    episode = db.get(Episode, episode_id)
+
+    if not episode:
+        raise HTTPException(
+            status_code=404,
+            detail="Episode not found",
+        )
+
+    db.delete(episode)
+    db.commit()
+
+
 @router.post(
     "/episodes/{episode_id}/publish-flag",
     response_model=EpisodeOut,
