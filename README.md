@@ -27,11 +27,14 @@ search reading only the published artifact, validation report, publish run
 history, health check, CI (lint + test + build image), a handful of tests
 on the riskiest paths (roles, artwork validation, publish idempotency).
 
-**Stubbed / not built (see plan below):** CMS React app, Viewer React app,
-real `seed_shows.json`/`reference.json` ingestion (seed.py has 1 demo show;
-swap in a loader for the real files once downloaded), R2Storage
-implementation (interface + doc comment only), deploy step (written, not
+**Stubbed / not built (see plan below):** Viewer React app, real
+`seed_shows.json`/`reference.json` ingestion (seed.py currently has 1 demo
+show; swap in a loader for the real files once downloaded), R2Storage
+implementation (interface + doc comment only), and deploy step (written, not
 wired to a real target — see `.github/workflows/ci.yml`).
+
+**Implemented:** CMS React app with admin authentication and published catalog
+integration with the Peblo TV API.
 
 ## Part E — written answers
 
