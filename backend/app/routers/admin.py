@@ -109,7 +109,7 @@ def update_show(
 
 @router.delete("/shows/{show_id}", status_code=204)
 def delete_show(
-    show_id: int,
+    show_id: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_admin),
 ):
