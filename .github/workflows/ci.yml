@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: peblo
+          POSTGRES_PASSWORD: peblo
+          POSTGRES_DB: peblo_tv_mini
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U peblo"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://peblo:peblo@localhost:5432/peblo_tv_mini
+      JWT_SECRET: ci-test-secret
+      STORAGE_BACKEND: local
+      STORAGE_ROOT: /tmp/storage
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: pip install ruff
+      - name: Lint
+        run: ruff check app/
+      - name: Tests
+        run: pytest tests/ -v
+
+  build-images:
+    needs: backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build backend image
+        run: docker build -t peblo-tv-mini-api:${{ github.sha }} ./backend
+      # Frontend image builds go here once the Vite scaffolds are filled in.
+
+  # --- Deploy (written, not wired to a real cloud for this exercise) ---
+  # deploy:
+  #   needs: build-images
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main'
+  #   steps:
+  #     - name: Push image to registry
+  #       run: docker push <registry>/peblo-tv-mini-api:${{ github.sha }}
+  #     - name: Deploy to Fly.io / ECS / Render
+  #       run: flyctl deploy --image <registry>/peblo-tv-mini-api:${{ github.sha }}
+  #       env:
+  #         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  #     # Rationale: build once in CI, deploy the exact same image everywhere,
+  #     # never rebuild at deploy time. Secrets come from GitHub Actions
+  #     # encrypted secrets, injected only at this final step.

@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: peblo
+      POSTGRES_PASSWORD: peblo
+      POSTGRES_DB: peblo_tv_mini
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U peblo -d peblo_tv_mini"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://peblo:peblo@db:5432/peblo_tv_mini
+      STORAGE_ROOT: /data/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - storage_data:/data/storage
+    command: >
+      sh -c "python -m app.seed && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  # cms:
+  #   build: ./frontend-cms
+  #   ports: ["5173:5173"]
+  #   depends_on: [api]
+  #
+  # viewer:
+  #   build: ./frontend-viewer
+  #   ports: ["5174:5174"]
+  #   depends_on: [api]
+  # ^ uncomment once the Vite scaffolds are filled in — see README Day 2 plan
+
+volumes:
+  pgdata:
+  storage_data:
