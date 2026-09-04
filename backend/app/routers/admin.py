@@ -113,7 +113,7 @@ def delete_show(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_admin),
 ):
-    show = db.query(Show).filter(Show.id == show_id).first()
+    show = db.query(Show).get(show_id)
 
     if not show:
         raise HTTPException(
