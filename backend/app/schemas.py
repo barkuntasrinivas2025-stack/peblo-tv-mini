@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import Optional, List
+
 from pydantic import BaseModel, Field
 
-from .models import Role, ArtworkKind, PublishOutcome
+from .models import ArtworkKind, PublishOutcome, Role
 
 
 class ArtworkOut(BaseModel):
@@ -21,14 +21,14 @@ class EpisodeIn(BaseModel):
     title: str
     language: str
     content_group: str
-    duration_seconds: Optional[int] = None
+    duration_seconds: int | None = None
     order_index: int = 0
 
 
 class EpisodeOut(EpisodeIn):
     id: str
     is_published: bool
-    artworks: List[ArtworkOut] = []
+    artworks: list[ArtworkOut] = []
 
     class Config:
         from_attributes = True
@@ -40,7 +40,7 @@ class SeasonIn(BaseModel):
 
 class SeasonOut(SeasonIn):
     id: str
-    episodes: List[EpisodeOut] = []
+    episodes: list[EpisodeOut] = []
 
     class Config:
         from_attributes = True
@@ -49,16 +49,16 @@ class SeasonOut(SeasonIn):
 class ShowIn(BaseModel):
     title: str
     synopsis: str = ""
-    section: Optional[str] = None
-    category: Optional[str] = None
+    section: str | None = None
+    category: str | None = None
 
 
 class ShowOut(ShowIn):
     id: str
     is_published: bool
     created_at: datetime
-    seasons: List[SeasonOut] = []
-    artworks: List[ArtworkOut] = []
+    seasons: list[SeasonOut] = []
+    artworks: list[ArtworkOut] = []
 
     class Config:
         from_attributes = True
@@ -73,19 +73,19 @@ class ValidationIssue(BaseModel):
 
 class ValidationReport(BaseModel):
     blocking_issue_count: int
-    issues: List[ValidationIssue]
+    issues: list[ValidationIssue]
 
 
 class PublishRunOut(BaseModel):
     id: str
     triggered_by: str
     started_at: datetime
-    finished_at: Optional[datetime]
-    outcome: Optional[PublishOutcome]
+    finished_at: datetime | None
+    outcome: PublishOutcome | None
     shows_count: int
     episodes_count: int
-    catalogue_key: Optional[str]
-    error: Optional[str]
+    catalogue_key: str | None
+    error: str | None
 
     class Config:
         from_attributes = True

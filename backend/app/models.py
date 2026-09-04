@@ -3,11 +3,19 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import (
-    Column, String, Integer, Boolean, DateTime, ForeignKey,
-    UniqueConstraint, Enum, JSON, Text,
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
 )
-from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 from .database import Base
 

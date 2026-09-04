@@ -21,12 +21,12 @@ output (deterministic ordering, no timestamps embedded in catalogue content
 itself) so publishing twice in a row is a safe no-op in effect.
 """
 import json
-from datetime import datetime
 from collections import defaultdict
+from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
-from .models import Show, Episode, Season, PublishRun, PublishOutcome, ArtworkKind
+from .models import Episode, PublishOutcome, PublishRun, Show
 from .schemas import ValidationIssue, ValidationReport
 from .storage import get_storage
 
@@ -142,13 +142,13 @@ def _build_catalogue_dict(db: Session) -> dict:
 
 def run_publish(db: Session, triggered_by: str) -> PublishRun:
     report = build_validation_report(db)
-    run = PublishRun(triggered_by=triggered_by, started_at=datetime.utcnow())
+    run = PublishRun(triggered_by=triggered_by, started_at=datetime.now(timezone.utc))
     db.add(run)
     db.commit()
     db.refresh(run)
 
     if report.blocking_issue_count > 0:
-        run.finished_at = datetime.utcnow()
+        run.finished_at = datetime.now(timezone.utc)
         run.outcome = PublishOutcome.failed
         run.error = f"{report.blocking_issue_count} blocking validation issue(s); publish aborted."
         db.commit()
@@ -178,7 +178,7 @@ def run_publish(db: Session, triggered_by: str) -> PublishRun:
         run.outcome = PublishOutcome.failed
         run.error = str(e)
     finally:
-        run.finished_at = datetime.utcnow()
+        run.finished_at = datetime.now(timezone.utc)
         db.commit()
 
     return run

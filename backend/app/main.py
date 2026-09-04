@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import OperationalError
 
 from .database import Base, engine
-from .routers import admin, catalog, auth_router
+from .routers import admin, auth_router, catalog
 
 app = FastAPI(title="Peblo TV Mini")
 

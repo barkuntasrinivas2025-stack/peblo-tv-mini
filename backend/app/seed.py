@@ -4,9 +4,9 @@ docker-compose up gives you something to click on immediately.
 Replace/extend with real seed_shows.json import once you have that file —
 see README for where that loader plugs in.
 """
-from .database import SessionLocal, Base, engine
-from .models import User, Role, Show, Season, Episode
 from .auth import hash_password
+from .database import Base, SessionLocal, engine
+from .models import Episode, Role, Season, Show, User
 
 Base.metadata.create_all(bind=engine)
 db = SessionLocal()

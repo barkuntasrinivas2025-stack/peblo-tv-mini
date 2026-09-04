@@ -1,15 +1,14 @@
 import os
-from datetime import datetime, timedelta
-from typing import Optional
+from datetime import datetime, timedelta, timezone
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from .database import get_db
-from .models import User, Role
+from .models import Role, User
 
 SECRET_KEY = os.getenv("JWT_SECRET", "dev-secret-change-me")
 ALGORITHM = "HS256"
@@ -28,7 +27,7 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 
 def create_access_token(username: str, role: Role) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {"sub": username, "role": role.value, "exp": expire}
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -43,7 +42,7 @@ def get_current_user(
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: Optional[str] = payload.get("sub")
+        username: str | None = payload.get("sub")
         if username is None:
             raise credentials_exc
     except JWTError:

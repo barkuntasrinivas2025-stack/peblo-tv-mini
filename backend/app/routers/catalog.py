@@ -1,10 +1,9 @@
 import json
-from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 
-from ..storage import get_storage
 from ..publish import CURRENT_POINTER_KEY
+from ..storage import get_storage
 
 router = APIRouter(tags=["catalog"])
 
@@ -25,10 +24,10 @@ def get_catalog():
 
 @router.get("/catalog/search")
 def search_catalog(
-    q: Optional[str] = None,
-    category: Optional[str] = None,
-    language: Optional[str] = None,
-    section: Optional[str] = None,
+    q: str | None = None,
+    category: str | None = None,
+    language: str | None = None,
+    section: str | None = None,
 ):
     catalogue = _load_current_catalogue()
     results = []
